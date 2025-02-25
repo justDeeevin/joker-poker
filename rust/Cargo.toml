@@ -1,0 +1,11 @@
+[package]
+name = "joker-poker"
+version = "0.1.0"
+edition = "2021"
+authors = ["Devin Droddy <devin.droddy@gmail.com>"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+godot = "0.2.4"

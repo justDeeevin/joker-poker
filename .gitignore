@@ -1,0 +1,4 @@
+rust/target
+.direnv
+godot/.godot
+godot/*.translation
