@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://bjvppjanf4g5s"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_f5xy3"]
+size = Vector2(100, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_by848"]
+size = Vector3(1, 1, 0)
+
+[node name="Card" type="Card"]
+texture = SubResource("PlaceholderTexture2D_f5xy3")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_by848")

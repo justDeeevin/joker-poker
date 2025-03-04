@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://d4co54lkftf3x"]
+
+[ext_resource type="PackedScene" uid="uid://bjvppjanf4g5s" path="res://Scenes/card.tscn" id="1_w4rvo"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Card" parent="." instance=ExtResource("1_w4rvo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.50676)
+
+[node name="Camera" type="Camera" parent="."]
+sprite_layers = 1
+
+[connection signal="mouse_entered" from="Card" to="Card" method="on_mouse_entered"]
+[connection signal="mouse_exited" from="Card" to="Card" method="on_mouse_exited"]
+[connection signal="mouse_ray_processed" from="Camera" to="Card" method="on_3d_mouse_ray_processed"]

@@ -8,4 +8,4 @@ authors = ["Devin Droddy <devin.droddy@gmail.com>"]
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = "0.2.4"
+godot = { version = "0.2.4", features = ["register-docs"] }
