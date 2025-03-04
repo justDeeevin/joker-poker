@@ -8,12 +8,14 @@ use godot::{
 pub struct Card {
     mouse_input_received: bool,
     mouse_over: bool,
+    reset_timer: Option<f64>,
 
     base: Base<Sprite3D>,
 }
 
 const PUSH_SCALE: f32 = 0.15;
 const HOVER_DRAW: f32 = 0.1;
+const RESET_LERP_SCALE: f64 = 4.0;
 
 #[godot_api]
 impl ISprite3D for Card {
@@ -22,6 +24,21 @@ impl ISprite3D for Card {
             base,
             mouse_over: false,
             mouse_input_received: false,
+            reset_timer: None,
+        }
+    }
+
+    fn process(&mut self, delta: f64) {
+        let Some(reset_timer) = self.reset_timer.as_mut() else {
+            return;
+        };
+        *reset_timer += delta * RESET_LERP_SCALE;
+        let reset_timer = *reset_timer as f32;
+        let rotation = self.base().get_rotation();
+        self.base_mut()
+            .set_rotation(rotation.lerp(Vector3::ZERO, reset_timer));
+        if self.base().get_rotation() == Vector3::ZERO {
+            self.reset_timer = None;
         }
     }
 }
@@ -70,15 +87,16 @@ impl Card {
 
     #[func]
     fn on_mouse_exited(&mut self) {
-        self.base_mut().set_rotation(Vector3::ZERO);
         self.base_mut()
             .translate(Vector3::new(0.0, 0.0, -HOVER_DRAW));
+        self.reset_timer = Some(0.0);
     }
 
     #[func]
     fn on_mouse_entered(&mut self) {
         self.base_mut()
             .translate(Vector3::new(0.0, 0.0, HOVER_DRAW));
+        self.reset_timer = None;
     }
 
     pub fn try_mouse_input(
