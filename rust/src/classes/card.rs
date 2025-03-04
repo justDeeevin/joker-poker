@@ -4,6 +4,8 @@ use godot::{
     prelude::*,
 };
 
+use super::camera::Camera;
+
 #[derive(GodotClass)]
 #[class(base=Sprite3D)]
 pub struct Card {
@@ -28,6 +30,26 @@ impl ISprite3D for Card {
             held: false,
             previous_position: Vector3::ZERO,
         }
+    }
+
+    fn ready(&mut self) {
+        let mut camera = self
+            .base()
+            .get_tree()
+            .unwrap()
+            .get_root()
+            .unwrap()
+            .get_node_as::<Camera>("Root/Camera");
+        camera.connect(
+            "mouse_ray_processed",
+            &self.base().callable("on_3d_mouse_ray_processed"),
+        );
+        let on_input_event = self.base().callable("on_input_event");
+        self.base_mut().connect("input_event", &on_input_event);
+        let on_mouse_entered = self.base().callable("on_mouse_entered");
+        self.base_mut().connect("mouse_entered", &on_mouse_entered);
+        let on_mouse_exited = self.base().callable("on_mouse_exited");
+        self.base_mut().connect("mouse_exited", &on_mouse_exited);
     }
 
     fn input(&mut self, event: Gd<InputEvent>) {
