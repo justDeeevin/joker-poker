@@ -8,7 +8,7 @@ const RAY_LENGTH: f32 = 1000.0;
 
 #[derive(GodotClass)]
 #[class(base=Camera3D)]
-struct Camera {
+pub struct Camera {
     query_mouse: bool,
     mouse_event: Option<Gd<InputEventMouse>>,
     #[export]
