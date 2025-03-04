@@ -12,6 +12,9 @@ pub struct Card {
     base: Base<Sprite3D>,
 }
 
+const PUSH_SCALE: f32 = 0.15;
+const HOVER_DRAW: f32 = 0.1;
+
 #[godot_api]
 impl ISprite3D for Card {
     fn init(base: Base<Sprite3D>) -> Self {
@@ -40,6 +43,18 @@ impl Card {
     fn mouse_exited();
 
     #[func]
+    fn on_input_event(
+        &mut self,
+        _camera: Gd<Node>,
+        _event: Gd<InputEvent>,
+        input_position: Vector3,
+        _normal: Vector3,
+    ) {
+        self.base_mut()
+            .set_rotation(Vector3::new(-input_position.y, input_position.x, 0.0) * PUSH_SCALE);
+    }
+
+    #[func]
     fn on_3d_mouse_ray_processed(&mut self) {
         if self.mouse_input_received {
             if !self.mouse_over {
@@ -53,15 +68,17 @@ impl Card {
         self.mouse_input_received = false;
     }
 
-    /// This is a function
     #[func]
-    fn on_mouse_entered(&mut self) {
-        self.base_mut().set_modulate(Color::RED);
+    fn on_mouse_exited(&mut self) {
+        self.base_mut().set_rotation(Vector3::ZERO);
+        self.base_mut()
+            .translate(Vector3::new(0.0, 0.0, -HOVER_DRAW));
     }
 
     #[func]
-    fn on_mouse_exited(&mut self) {
-        self.base_mut().set_modulate(Color::WHITE);
+    fn on_mouse_entered(&mut self) {
+        self.base_mut()
+            .translate(Vector3::new(0.0, 0.0, HOVER_DRAW));
     }
 
     pub fn try_mouse_input(
