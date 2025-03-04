@@ -11,8 +11,8 @@ const RAY_LENGTH: f32 = 1000.0;
 struct Camera {
     query_mouse: bool,
     mouse_event: Option<Gd<InputEventMouse>>,
-    /// The physics layers for raycasting
     #[export]
+    /// The physics layers for raycasting
     sprite_layers: u32,
 
     base: Base<Camera3D>,
