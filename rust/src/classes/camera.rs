@@ -8,7 +8,6 @@ const RAY_LENGTH: f32 = 1000.0;
 
 #[derive(GodotClass)]
 #[class(base=Camera3D)]
-/// Test
 struct Camera {
     query_mouse: bool,
     mouse_event: Option<Gd<InputEventMouse>>,
