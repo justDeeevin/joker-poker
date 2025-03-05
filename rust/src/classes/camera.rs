@@ -7,11 +7,11 @@ use godot::{
 const RAY_LENGTH: f32 = 1000.0;
 
 #[derive(GodotClass)]
-#[class(base=Camera3D)]
+#[class(init, base=Camera3D)]
 pub struct Camera {
     query_mouse: bool,
     mouse_event: Option<Gd<InputEventMouse>>,
-    #[export]
+    #[export(flags_3d_physics)]
     /// The physics layers for raycasting
     sprite_layers: u32,
 
@@ -20,15 +20,6 @@ pub struct Camera {
 
 #[godot_api]
 impl ICamera3D for Camera {
-    fn init(base: Base<Camera3D>) -> Self {
-        Self {
-            base,
-            query_mouse: false,
-            mouse_event: None,
-            sprite_layers: 0,
-        }
-    }
-
     fn unhandled_input(&mut self, event: Gd<InputEvent>) {
         if let Ok(event) = event.try_cast::<InputEventMouse>() {
             self.query_mouse = true;
