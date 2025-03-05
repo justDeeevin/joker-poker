@@ -7,7 +7,7 @@ use godot::{
 use super::camera::Camera;
 
 #[derive(GodotClass)]
-#[class(base=Sprite3D)]
+#[class(init, base=Sprite3D)]
 pub struct Card {
     mouse_input_received: bool,
     mouse_over: bool,
@@ -19,19 +19,10 @@ pub struct Card {
 
 const PUSH_SCALE: f32 = 0.15;
 const HOVER_DRAW: f32 = 0.1;
+const DRAG_SCALE: f32 = 1.2;
 
 #[godot_api]
 impl ISprite3D for Card {
-    fn init(base: Base<Sprite3D>) -> Self {
-        Self {
-            base,
-            mouse_over: false,
-            mouse_input_received: false,
-            held: false,
-            previous_position: Vector3::ZERO,
-        }
-    }
-
     fn ready(&mut self) {
         let mut camera = self
             .base()
@@ -46,20 +37,14 @@ impl ISprite3D for Card {
         );
         let on_input_event = self.base().callable("on_input_event");
         self.base_mut().connect("input_event", &on_input_event);
-        let on_mouse_entered = self.base().callable("on_mouse_entered");
-        self.base_mut().connect("mouse_entered", &on_mouse_entered);
-        let on_mouse_exited = self.base().callable("on_mouse_exited");
-        self.base_mut().connect("mouse_exited", &on_mouse_exited);
     }
 
     fn input(&mut self, event: Gd<InputEvent>) {
-        if !self.mouse_over {
-            return;
-        }
         if let Ok(event) = event.clone().try_cast::<InputEventMouseButton>() {
             if event.get_button_index() == MouseButton::LEFT {
-                if event.is_pressed() {
+                if event.is_pressed() && self.mouse_over {
                     self.held = true;
+                    self.base_mut().set_rotation(Vector3::ZERO);
                 } else if event.is_released() {
                     self.held = false;
                 }
@@ -78,12 +63,6 @@ impl Card {
         normal: Vector3,
     );
 
-    #[signal]
-    fn mouse_entered();
-
-    #[signal]
-    fn mouse_exited();
-
     #[func]
     fn on_input_event(
         &mut self,
@@ -92,12 +71,14 @@ impl Card {
         input_position: Vector3,
         _normal: Vector3,
     ) {
+        let relative_position = input_position - self.base().get_position();
         if self.held {
             let delta = input_position - self.previous_position;
             self.base_mut()
                 .translate(Vector3::new(delta.x, delta.y, 0.0));
+            self.base_mut()
+                .set_rotation(Vector3::new(0.0, 0.0, -delta.x * DRAG_SCALE));
         } else {
-            let relative_position = input_position - self.base().get_position();
             self.base_mut().set_rotation(
                 Vector3::new(-relative_position.y, relative_position.x, 0.0) * PUSH_SCALE,
             );
@@ -110,11 +91,11 @@ impl Card {
         if self.mouse_input_received {
             if !self.mouse_over {
                 self.mouse_over = true;
-                self.base_mut().emit_signal("mouse_entered", &[]);
+                self.on_mouse_entered();
             }
         } else if self.mouse_over {
             self.mouse_over = false;
-            self.base_mut().emit_signal("mouse_exited", &[]);
+            self.on_mouse_exited();
         }
         self.mouse_input_received = false;
     }
@@ -124,7 +105,6 @@ impl Card {
         self.base_mut()
             .translate(Vector3::new(0.0, 0.0, -HOVER_DRAW));
         self.base_mut().set_rotation(Vector3::ZERO);
-        self.held = false;
     }
 
     #[func]
